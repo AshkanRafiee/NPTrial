@@ -1,5 +1,5 @@
 # NPTrial
-Nessus Pro Trial!
+Nessus Pro Trial Grabber!
 
 ## Installation
 ```pip install -r requirements.txt```
