@@ -160,10 +160,10 @@ def nessus_login(activation_url,email,random_password):
     driver.find_element_by_css_selector("input[name='password'][type='password'][placeholder='Password']").send_keys(random_password)
     driver.find_element_by_css_selector("button[class='auth0-lock-submit'][type='submit']").click()
 
-    print("Logged In! Let's Find the Activation Key... (15 Seconds)")
-
     time.sleep(2)
 
+    print("Logged In! Let's Find the Activation Key... (15 Seconds)")
+    
     driver.get("https://community.tenable.com/s/trials")
     time.sleep(5)
     driver.get("https://community.tenable.com/s/trials")
