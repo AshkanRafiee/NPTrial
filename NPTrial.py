@@ -227,6 +227,7 @@ def main():
             active_code = nessus_login(activation_url,email,random_password)
 
             print("Your Active Code is:",active_code)
+            print("Head to https://plugins.nessus.org/v2/offline.php if you don't know how to use this!")
 
         else:
             print("Nessus Trial Request Failed!")
