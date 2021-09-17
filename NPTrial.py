@@ -160,7 +160,7 @@ def nessus_login(activation_url,email,random_password):
     driver.find_element_by_css_selector("input[name='password'][type='password'][placeholder='Password']").send_keys(random_password)
     driver.find_element_by_css_selector("button[class='auth0-lock-submit'][type='submit']").click()
 
-    print("Logged In! Let's Find the Activation Key...")
+    print("Logged In! Let's Find the Activation Key... (15 Seconds)")
 
     time.sleep(2)
 
@@ -175,60 +175,63 @@ def nessus_login(activation_url,email,random_password):
     return active_code
 
 def main():
-    # Generate Random Details
-    random_name = gen_name()
-    random_password = gen_pass()
-    random_number = gen_phone()
-    email = mail_generator(random_name,random_password)
-    print("Your TempMail is: ",email)
-    print("Your Password is: ",random_password)
-    eid,token = get_token(email,random_password)
-    print("Logged Into Email!")
+    try:
+        # Generate Random Details
+        random_name = gen_name()
+        random_password = gen_pass()
+        random_number = gen_phone()
+        email = mail_generator(random_name,random_password)
+        print("Your TempMail is: ",email)
+        print("Your Password is: ",random_password)
+        eid,token = get_token(email,random_password)
+        print("Logged Into Email!")
 
-    # Request Trial
-    nessus_r = request_trial(random_name,email,random_number)
-    print("Nessus Trial Response: ",nessus_r)
-    print("--Usually it takes 10-15 mins to receive mail--")
+        # Request Trial
+        nessus_r = request_trial(random_name,email,random_number)
+        print("Nessus Trial Response: ",nessus_r)
+        print("--Usually it takes 10-15 mins to receive mail--")
 
-    # Wait for mail, Register at Tenable, Login and Extract Activation Code
-    if nessus_r == "Success":
-        nessus_req_iter = 1
-        mail_count = get_mail_count(token)
-        wait_iter = 0
-        while mail_count == 0:
-            if nessus_req_iter >= 3:
-                print("What the hell is wrong with Tenable...")
-                Print("Try changing yout ip address and Run again!")
-            if wait_iter >= 7:
-                wait_iter = 0
-                print("They Didn't Send it yet...")
-                print("Requesting Trial Again...")
-                nessus_r = request_trial(random_name,email,random_number)
-                print("Nessus Trial Response: ",nessus_r)
-                print("--Usually it takes 10-15 mins to receive mail--")
-                nessus_req_iter += 1
-            print("Still Got No Email, Waiting 2 Minute...")
-            wait_iter += 1
-            for remaining in range(120, 0, -1):
-                sys.stdout.write("\r")
-                sys.stdout.write("{:2d} seconds remaining.".format(remaining))
-                sys.stdout.flush()
-                time.sleep(1)
-            sys.stdout.write("\rChecking Mail...              \n")
-            mail_count  = get_mail_count(token)
+        # Wait for mail, Register at Tenable, Login and Extract Activation Code
+        if nessus_r == "Success":
+            nessus_req_iter = 1
+            mail_count = get_mail_count(token)
+            wait_iter = 0
+            while mail_count == 0:
+                if nessus_req_iter >= 3:
+                    print("What the hell is wrong with Tenable...")
+                    Print("Try changing yout ip address and Run again!")
+                if wait_iter >= 7:
+                    wait_iter = 0
+                    print("They Didn't Send it yet...")
+                    print("Requesting Trial Again...")
+                    nessus_r = request_trial(random_name,email,random_number)
+                    print("Nessus Trial Response: ",nessus_r)
+                    print("--Usually it takes 10-15 mins to receive mail--")
+                    nessus_req_iter += 1
+                print("Still Got No Email, Waiting 2 Minute...")
+                wait_iter += 1
+                for remaining in range(120, 0, -1):
+                    sys.stdout.write("\r")
+                    sys.stdout.write("{:2d} seconds remaining.".format(remaining))
+                    sys.stdout.flush()
+                    time.sleep(1)
+                sys.stdout.write("\rChecking Mail...              \n")
+                mail_count  = get_mail_count(token)
 
-        mid = get_mail_id(token)
-        html = get_mail(mid,token)
-        activation_url = mail_parser(html)
-        print("-----Got it!-----")
-        print(activation_url)
-        print("I'm Lazier than this... Let's Get the Activation Code!")
-        active_code = nessus_login(activation_url,email,random_password)
+            mid = get_mail_id(token)
+            html = get_mail(mid,token)
+            activation_url = mail_parser(html)
+            print("-----Got it!-----")
+            print(activation_url)
+            print("I'm Lazier than this... Let's Get the Activation Code!")
+            active_code = nessus_login(activation_url,email,random_password)
 
-        print("Your Active Code is:",active_code)
+            print("Your Active Code is:",active_code)
 
-    else:
-        print("Nessus Trial Request Failed!")
+        else:
+            print("Nessus Trial Request Failed!")
+    except:
+        Print("Something Wrong Happened!")
 
 if __name__ == '__main__':
     main()
