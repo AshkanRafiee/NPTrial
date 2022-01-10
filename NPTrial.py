@@ -199,7 +199,7 @@ def main():
             while mail_count == 0:
                 if nessus_req_iter >= 3:
                     print("What the hell is wrong with Tenable...")
-                    Print("Try changing yout ip address and Run again!")
+                    print("Try changing yout ip address and Run again!")
                 if wait_iter >= 7:
                     wait_iter = 0
                     print("They Didn't Send it yet...")
@@ -232,7 +232,7 @@ def main():
         else:
             print("Nessus Trial Request Failed!")
     except:
-        Print("Something Wrong Happened!")
+        print("Something Wrong Happened!")
 
 if __name__ == '__main__':
     main()
