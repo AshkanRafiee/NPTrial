@@ -11,6 +11,8 @@ from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.remote.remote_connection import LOGGER
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
 LOGGER.setLevel(logging.WARNING)
 
 
@@ -142,12 +144,15 @@ def nessus_login(activation_url,email,random_password):
     options.headless = True
     options.add_argument('--headless')
     options.add_experimental_option("excludeSwitches", ["enable-logging"])
-    driver = webdriver.Chrome(ChromeDriverManager().install(),options=options)
+    # driver = webdriver.Chrome(ChromeDriverManager().install(),options=options)
+    s=Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=s,options=options)
+
 
     driver.get(activation_url)
-    driver.find_element_by_css_selector("input[name='password'][type='password'][placeholder='New password']").send_keys(random_password)
-    driver.find_element_by_css_selector("input[name='password'][type='password'][placeholder='Confirm password']").send_keys(random_password)
-    driver.find_element_by_css_selector("button[class='auth0-lock-submit'][type='submit']").click()
+    driver.find_element(By.CSS_SELECTOR, "input[name='password'][type='password'][placeholder='New password']").send_keys(random_password)
+    driver.find_element(By.CSS_SELECTOR, "input[name='password'][type='password'][placeholder='Confirm password']").send_keys(random_password)
+    driver.find_element(By.CSS_SELECTOR, "button[class='auth0-lock-submit'][type='submit']").click()
 
     print("I just Signed Up at Nessus with provided email and password!")
     print("Let's Login...")
@@ -156,9 +161,9 @@ def nessus_login(activation_url,email,random_password):
 
     driver.get("https://community.tenable.com/login")
     time.sleep(5)
-    driver.find_element_by_css_selector("input[type='email'][placeholder='Email Address']").send_keys(email)
-    driver.find_element_by_css_selector("input[name='password'][type='password'][placeholder='Password']").send_keys(random_password)
-    driver.find_element_by_css_selector("button[class='auth0-lock-submit'][type='submit']").click()
+    driver.find_element(By.CSS_SELECTOR, "input[type='email'][placeholder='Email Address']").send_keys(email)
+    driver.find_element(By.CSS_SELECTOR, "input[name='password'][type='password'][placeholder='Password']").send_keys(random_password)
+    driver.find_element(By.CSS_SELECTOR, "button[class='auth0-lock-submit'][type='submit']").click()
 
     time.sleep(2)
 
@@ -169,70 +174,70 @@ def nessus_login(activation_url,email,random_password):
     driver.get("https://community.tenable.com/s/trials")
     time.sleep(10)
 
-    active_code = driver.find_element_by_css_selector("span[class='evalCode']").text
+    active_code = driver.find_element(By.CSS_SELECTOR, "span[class='evalCode']").text
     active_code = re.search(r'....-....-....-....',active_code).group()
     driver.close()
     return active_code
 
 def main():
-    try:
-        # Generate Random Details
-        random_name = gen_name()
-        random_password = gen_pass()
-        random_number = gen_phone()
-        email = mail_generator(random_name,random_password)
-        print("Your TempMail is: ",email)
-        print("Your Password is: ",random_password)
-        eid,token = get_token(email,random_password)
-        print("Logged Into Email!")
+    # try:
+    # Generate Random Details
+    random_name = gen_name()
+    random_password = gen_pass()
+    random_number = gen_phone()
+    email = mail_generator(random_name,random_password)
+    print("Your TempMail is: ",email)
+    print("Your Password is: ",random_password)
+    eid,token = get_token(email,random_password)
+    print("Logged Into Email!")
 
-        # Request Trial
-        nessus_r = request_trial(random_name,email,random_number)
-        print("Nessus Trial Response: ",nessus_r)
-        print("--Usually it takes 10-15 mins to receive mail--")
+    # Request Trial
+    nessus_r = request_trial(random_name,email,random_number)
+    print("Nessus Trial Response: ",nessus_r)
+    print("--Usually it takes 10-15 mins to receive mail--")
 
-        # Wait for mail, Register at Tenable, Login and Extract Activation Code
-        if nessus_r == "Success":
-            nessus_req_iter = 1
-            mail_count = get_mail_count(token)
-            wait_iter = 0
-            while mail_count == 0:
-                if nessus_req_iter >= 3:
-                    print("What the hell is wrong with Tenable...")
-                    print("Try changing yout ip address and Run again!")
-                if wait_iter >= 7:
-                    wait_iter = 0
-                    print("They Didn't Send it yet...")
-                    print("Requesting Trial Again...")
-                    nessus_r = request_trial(random_name,email,random_number)
-                    print("Nessus Trial Response: ",nessus_r)
-                    print("--Usually it takes 10-15 mins to receive mail--")
-                    nessus_req_iter += 1
-                print("Still Got No Email, Waiting 2 Minute...")
-                wait_iter += 1
-                for remaining in range(120, 0, -1):
-                    sys.stdout.write("\r")
-                    sys.stdout.write("{:2d} seconds remaining.".format(remaining))
-                    sys.stdout.flush()
-                    time.sleep(1)
-                sys.stdout.write("\rChecking Mail...              \n")
-                mail_count  = get_mail_count(token)
+    # Wait for mail, Register at Tenable, Login and Extract Activation Code
+    if nessus_r == "Success":
+        nessus_req_iter = 1
+        mail_count = get_mail_count(token)
+        wait_iter = 0
+        while mail_count == 0:
+            if nessus_req_iter >= 3:
+                print("What the hell is wrong with Tenable...")
+                print("Try changing yout ip address and Run again!")
+            if wait_iter >= 7:
+                wait_iter = 0
+                print("They Didn't Send it yet...")
+                print("Requesting Trial Again...")
+                nessus_r = request_trial(random_name,email,random_number)
+                print("Nessus Trial Response: ",nessus_r)
+                print("--Usually it takes 10-15 mins to receive mail--")
+                nessus_req_iter += 1
+            print("Still Got No Email, Waiting 2 Minute...")
+            wait_iter += 1
+            for remaining in range(120, 0, -1):
+                sys.stdout.write("\r")
+                sys.stdout.write("{:2d} seconds remaining.".format(remaining))
+                sys.stdout.flush()
+                time.sleep(1)
+            sys.stdout.write("\rChecking Mail...              \n")
+            mail_count  = get_mail_count(token)
 
-            mid = get_mail_id(token)
-            html = get_mail(mid,token)
-            activation_url = mail_parser(html)
-            print("-----Got it!-----")
-            print(activation_url)
-            print("I'm Lazier than this... Let's Get the Activation Code!")
-            active_code = nessus_login(activation_url,email,random_password)
+        mid = get_mail_id(token)
+        html = get_mail(mid,token)
+        activation_url = mail_parser(html)
+        print("-----Got it!-----")
+        print(activation_url)
+        print("I'm Lazier than this... Let's Get the Activation Code!")
+        active_code = nessus_login(activation_url,email,random_password)
 
-            print("Your Active Code is:",active_code)
-            print("Head to https://plugins.nessus.org/v2/offline.php if you don't know how to use this!")
+        print("Your Active Code is:",active_code)
+        print("Head to https://plugins.nessus.org/v2/offline.php if you don't know how to use this!")
 
-        else:
-            print("Nessus Trial Request Failed!")
-    except:
-        print("Something Wrong Happened!")
+    else:
+        print("Nessus Trial Request Failed!")
+    # except:
+    #     print("Something Wrong Happened!")
 
 if __name__ == '__main__':
     main()
