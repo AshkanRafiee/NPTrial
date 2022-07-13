@@ -108,7 +108,7 @@ def request_trial(random_name,random_email,random_num):
     "country": "", 
     "email": random_email, 
     "essentialsOptIn": False, "first_name": random_name, 
-    "last_name": random_name, 
+    "last_name": random_name,
     "lookbook": "", 
     "mkt_tok": "", 
     "partnerId": "", 
@@ -128,6 +128,8 @@ def request_trial(random_name,random_email,random_num):
     "utm_term": "", 
     "zip": ""}
     r = requests.post(url, headers=headers, json=body)
+    print(r.status_code)
+    print(r.content)
     parsed = r.json()
     message = parsed["message"]
     return message
@@ -167,17 +169,61 @@ def nessus_login(activation_url,email,random_password):
 
     time.sleep(2)
 
-    print("Logged In! Let's Find the Activation Key... (15 Seconds)")
+    print("Logged In! Let's Find the Activation Key... (30 Seconds)")
     
     driver.get("https://community.tenable.com/s/trials")
-    time.sleep(5)
-    driver.get("https://community.tenable.com/s/trials")
     time.sleep(10)
+    driver.get("https://community.tenable.com/s/trials")
+    time.sleep(15)
 
     active_code = driver.find_element(By.CSS_SELECTOR, "span[class='evalCode']").text
     active_code = re.search(r'....-....-....-....',active_code).group()
     driver.close()
     return active_code
+
+def pro_to_expert(random_name,email,random_number,active_code):
+
+    url     = "https://www.tenable.com:443/evaluations/api/v1/nessus-expert/upgrade"
+    headers = {"Content-Type": "application/json"}
+    body    = {
+    "_mkto_trk": "",
+     "alert_email": "",
+    "apps": ["nessus-pro-to-expert"], 
+    "code": active_code, 
+    "company": random_name, 
+    "companySize": "1-9", 
+    "consentOptIn": True, 
+    "country": "", 
+    "email": email, 
+    "essentialsOptIn": False, 
+    "first_name": random_name, 
+    "last_name": random_name, 
+    "length_in_days": 7, 
+    "lookbook": "", 
+    "mkt_tok": "", 
+    "partnerId": "", 
+    "phone": random_number, 
+    "pid": "", 
+    "preferredSiteId": "", 
+    "queryParameters": "utm_promoter=&utm_source=&utm_medium=&utm_campaign=&utm_content=&utm_term=&pid=&lookbook=&product_eval=nessus-pro-to-expert", 
+    "referrer": "https://www.tenable.com/products/nessus/nessus-expert/evaluate/upgrade?utm_promoter=&utm_source=&utm_medium=&utm_campaign=&utm_content=&utm_term=&pid=&lookbook=&product_eval=nessus-pro-to-expert", 
+    "region": "", 
+    "tempProductInterest": "", 
+    "title": random_name, 
+    "utm_campaign": "", 
+    "utm_content": "", 
+    "utm_medium": "", 
+    "utm_promoter": "", 
+    "utm_source": "", 
+    "utm_term": "", 
+    "zip": ""
+    }
+    r = requests.post(url, headers=headers, json=body)
+    print(r.status_code)
+    print(r.content)
+    parsed = r.json()
+    message = parsed["message"]
+    return message
 
 def main():
     # try:
@@ -233,6 +279,11 @@ def main():
 
         print("Your Active Code is:",active_code)
         print("Head to https://plugins.nessus.org/v2/offline.php if you don't know how to use this!")
+
+        print("Let's have Even More...")
+        print("Trying to convert our pro license to Nessus Expert...")
+        change_result = pro_to_expert(random_name,email,random_number,active_code)
+        print(change_result)
 
     else:
         print("Nessus Trial Request Failed!")
