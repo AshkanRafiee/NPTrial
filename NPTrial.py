@@ -128,7 +128,7 @@ def request_trial(random_name,random_email,random_num):
     "utm_term": "", 
     "zip": ""}
     r = requests.post(url, headers=headers, json=body)
-    print(r.status_code)
+    # print(r.status_code)
     # print(r.content)
     parsed = r.json()
     message = parsed["message"]
@@ -219,7 +219,7 @@ def pro_to_expert(random_name,email,random_number,active_code):
     "zip": ""
     }
     r = requests.post(url, headers=headers, json=body)
-    print(r.status_code)
+    # print(r.status_code)
     # print(r.content)
     parsed = r.json()
     message = parsed["message"]
