@@ -117,7 +117,7 @@ def main():
         # Request Trial
         nessus_r = request_trial(random_name,email,random_number)
         print("Nessus Trial Response: ",nessus_r)
-        print("Use nessuscli.exe fetch --register xxxx-xxxx-xxxx-xxxx to activate your product")
+        print(f"Use nessuscli.exe fetch --register {nessus_r['code']} to activate your product")
         print("You can also use https://plugins.nessus.org/v2/offline.php for offline activation")
     except:
         print("Something Wrong Happened!")
