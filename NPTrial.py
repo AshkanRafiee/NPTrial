@@ -1,19 +1,6 @@
 import random
 import string
-import json
-import time
-import sys
-import re
 import requests
-import logging
-from bs4 import BeautifulSoup
-from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.remote.remote_connection import LOGGER
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-LOGGER.setLevel(logging.WARNING)
 
 
 # Generate Random 8-Char String
@@ -96,199 +83,44 @@ def gen_phone():
 
 # Request Nessus Pro Trial
 def request_trial(random_name,random_email,random_num):
-    url = "https://www.tenable.com/evaluations/api/v1/nessus-pro"
+    url = "https://www.tenable.com/evaluations/api/v2/trials"
     headers = {"Content-Type": "application/json"}
-    body={"_mkto_trk": "", 
-    "alert_email": "", 
-    "apps": ["nessus"], 
-    "code": "", 
-    "company": random_name, 
-    "companySize": "1-9", 
-    "consentOptIn": True, 
-    "country": "", 
-    "email": random_email, 
-    "essentialsOptIn": False, "first_name": random_name, 
-    "last_name": random_name,
-    "lookbook": "", 
-    "mkt_tok": "", 
-    "partnerId": "", 
-    "phone": random_num, 
-    "pid": "", 
-    "preferredSiteId": "", 
-    "queryParameters": "utm_promoter=&utm_source=&utm_medium=&utm_campaign=&utm_content=&utm_term=&pid=&lookbook=&product_eval=nessus", 
-    "referrer": "https://www.tenable.com/products/nessus/nessus-professional/evaluate?utm_promoter=&utm_source=&utm_medium=&utm_campaign=&utm_content=&utm_term=&pid=&lookbook=&product_eval=nessus", 
-    "region": "", 
-    "tempProductInterest": "Nessus Professional", 
-    "title": random_name, 
-    "utm_campaign": "", 
-    "utm_content": "", 
-    "utm_medium": "", 
-    "utm_promoter": "", 
-    "utm_source": "", 
-    "utm_term": "", 
-    "zip": ""}
-    r = requests.post(url, headers=headers, json=body)
-    # print(r.status_code)
-    # print(r.content)
-    parsed = r.json()
-    message = parsed["message"]
-    return message
-
-# Parse Mail Body
-def mail_parser(html):
-    soup = BeautifulSoup(html, 'html.parser')
-    first_link = soup.find('a').get('href')
-    return first_link
-
-# Register at Tenable, Login and Get Trial Token
-def nessus_login(activation_url,email,random_password):
-    options = Options()
-    options.headless = True
-    options.add_argument('--headless')
-    options.add_experimental_option("excludeSwitches", ["enable-logging"])
-    # driver = webdriver.Chrome(ChromeDriverManager().install(),options=options)
-    s=Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=s,options=options)
-
-
-    driver.get(activation_url)
-    driver.find_element(By.CSS_SELECTOR, "input[name='password'][type='password'][placeholder='New password']").send_keys(random_password)
-    driver.find_element(By.CSS_SELECTOR, "input[name='password'][type='password'][placeholder='Confirm password']").send_keys(random_password)
-    driver.find_element(By.CSS_SELECTOR, "button[class='auth0-lock-submit'][type='submit']").click()
-
-    print("I just Signed Up at Nessus with provided email and password!")
-    print("Let's Login...")
-
-    time.sleep(10)
-
-    driver.get("https://community.tenable.com/login")
-    time.sleep(5)
-    driver.find_element(By.CSS_SELECTOR, "input[type='email'][placeholder='Email Address']").send_keys(email)
-    driver.find_element(By.CSS_SELECTOR, "input[name='password'][type='password'][placeholder='Password']").send_keys(random_password)
-    driver.find_element(By.CSS_SELECTOR, "button[class='auth0-lock-submit'][type='submit']").click()
-
-    time.sleep(2)
-
-    print("Logged In! Let's Find the Activation Key... (30 Seconds)")
-    
-    driver.get("https://community.tenable.com/s/trials")
-    time.sleep(10)
-    driver.get("https://community.tenable.com/s/trials")
-    time.sleep(15)
-
-    active_code = driver.find_element(By.CSS_SELECTOR, "span[class='evalCode']").text
-    active_code = re.search(r'....-....-....-....',active_code).group()
-    driver.close()
-    return active_code
-
-def pro_to_expert(random_name,email,random_number,active_code):
-
-    url     = "https://www.tenable.com:443/evaluations/api/v1/nessus-expert/upgrade"
-    headers = {"Content-Type": "application/json"}
-    body    = {
-    "_mkto_trk": "",
-     "alert_email": "",
-    "apps": ["nessus-pro-to-expert"], 
-    "code": active_code, 
-    "company": random_name, 
-    "companySize": "1-9", 
-    "consentOptIn": True, 
-    "country": "", 
-    "email": email, 
-    "essentialsOptIn": False, 
-    "first_name": random_name, 
-    "last_name": random_name, 
-    "length_in_days": 7, 
-    "lookbook": "", 
-    "mkt_tok": "", 
-    "partnerId": "", 
-    "phone": random_number, 
-    "pid": "", 
-    "preferredSiteId": "", 
-    "queryParameters": "utm_promoter=&utm_source=&utm_medium=&utm_campaign=&utm_content=&utm_term=&pid=&lookbook=&product_eval=nessus-pro-to-expert", 
-    "referrer": "https://www.tenable.com/products/nessus/nessus-expert/evaluate/upgrade?utm_promoter=&utm_source=&utm_medium=&utm_campaign=&utm_content=&utm_term=&pid=&lookbook=&product_eval=nessus-pro-to-expert", 
-    "region": "", 
-    "tempProductInterest": "", 
-    "title": random_name, 
-    "utm_campaign": "", 
-    "utm_content": "", 
-    "utm_medium": "", 
-    "utm_promoter": "", 
-    "utm_source": "", 
-    "utm_term": "", 
-    "zip": ""
+    body={
+    "skipContactLookup":"true",
+    "product":"expert",
+    "first_name":random_name,
+    "last_name":random_name,
+    "email":random_email,
+    "phone":random_num,
+    "title":random_name,
+    "company":random_name,
+    "companySize":"1-9",
+    "apps":["expert"]
     }
     r = requests.post(url, headers=headers, json=body)
     # print(r.status_code)
     # print(r.content)
     parsed = r.json()
-    message = parsed["message"]
+    message = parsed["trial"]
     return message
 
 def main():
-    # try:
-    # Generate Random Details
-    random_name = gen_name()
-    random_password = gen_pass()
-    random_number = gen_phone()
-    email = mail_generator(random_name,random_password)
-    print("Your TempMail is: ",email)
-    print("Your Password is: ",random_password)
-    eid,token = get_token(email,random_password)
-    print("Logged Into Email!")
+    try:
+        # Generate Random Details
+        random_name = gen_name()
+        random_password = gen_pass()
+        random_number = gen_phone()
+        email = mail_generator(random_name,random_password)
+        print("Your TempMail is: ",email)
+        print("Your Password is: ",random_password)
 
-    # Request Trial
-    nessus_r = request_trial(random_name,email,random_number)
-    print("Nessus Trial Response: ",nessus_r)
-    print("--Usually it takes 10-15 mins to receive mail--")
-
-    # Wait for mail, Register at Tenable, Login and Extract Activation Code
-    if nessus_r == "Success":
-        nessus_req_iter = 1
-        mail_count = get_mail_count(token)
-        wait_iter = 0
-        while mail_count == 0:
-            if nessus_req_iter >= 3:
-                print("What the hell is wrong with Tenable...")
-                print("Try changing yout ip address and Run again!")
-            if wait_iter >= 7:
-                wait_iter = 0
-                print("They Didn't Send it yet...")
-                print("Requesting Trial Again...")
-                nessus_r = request_trial(random_name,email,random_number)
-                print("Nessus Trial Response: ",nessus_r)
-                print("--Usually it takes 10-15 mins to receive mail--")
-                nessus_req_iter += 1
-            print("Still Got No Email, Waiting 2 Minute...")
-            wait_iter += 1
-            for remaining in range(120, 0, -1):
-                sys.stdout.write("\r")
-                sys.stdout.write("{:2d} seconds remaining.".format(remaining))
-                sys.stdout.flush()
-                time.sleep(1)
-            sys.stdout.write("\rChecking Mail...              \n")
-            mail_count  = get_mail_count(token)
-
-        mid = get_mail_id(token)
-        html = get_mail(mid,token)
-        activation_url = mail_parser(html)
-        print("-----Got it!-----")
-        print(activation_url)
-        print("I'm Lazier than this... Let's Get the Activation Code!")
-        active_code = nessus_login(activation_url,email,random_password)
-
-        print("Your Active Code is:",active_code)
-        print("Head to https://plugins.nessus.org/v2/offline.php if you don't know how to use this!")
-
-        print("Let's have Even More...")
-        print("Trying to convert our pro license to Nessus Expert...")
-        change_result = pro_to_expert(random_name,email,random_number,active_code)
-        print(change_result)
-
-    else:
-        print("Nessus Trial Request Failed!")
-    # except:
-    #     print("Something Wrong Happened!")
+        # Request Trial
+        nessus_r = request_trial(random_name,email,random_number)
+        print("Nessus Trial Response: ",nessus_r)
+        print("Use nessuscli.exe fetch --register xxxx-xxxx-xxxx-xxxx to activate your product")
+        print("You can also use https://plugins.nessus.org/v2/offline.php for offline activation")
+    except:
+        print("Something Wrong Happened!")
 
 if __name__ == '__main__':
     main()
