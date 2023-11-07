@@ -5,7 +5,7 @@ Nessus Pro Trial Grabber!
 ```pip install -r requirements.txt```
 
 ## Usage
-```python NPTrial.py```
+```python nptrial.py```
 
 ## Disclaimer
 I am not responsible for any misuse or illegal behaviour made by anyone. Use it at your own risk.
